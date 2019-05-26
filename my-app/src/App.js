@@ -4,22 +4,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import $ from "jquery";
 import { Table,Button,Modal,ModalBody,ModalFooter,ModalHeader } from 'reactstrap';
 
-
- 
-
 class Nav extends Component {
   constructor(props) {
   super(props);
   this.toggleNavbar = this.toggleNavbar.bind(this);
   this.state = {
   collapsed: true,
-  modal: false
+  modal: false,
+  modalCat:false,
+  collapsedCat:true
   };
   this.toggle = this.toggle.bind(this);
+  this.toggleCat = this.toggleCat.bind(this);
+  this.saveCategory=this.saveCategory.bind(this);
+
   this.trans = this.trans.bind(this);
 
 
-  this.state={  amount:0,table:[]  }
+  this.state={  amount:0,table:[],total:0,categoryArr:["Gas"]  }
 
   }
   //NavBar toggle logic
@@ -37,21 +39,43 @@ class Nav extends Component {
 
    }
 
+
+  //modal toggle logic
+  toggleCat() {
+    this.setState(prevState => ({
+      modalCat: !prevState.modalCat
+    }));
+
+   }
+
   trans() {
 
 
     this.setState(prevState => ({
       modal: !prevState.modal
     }));
-    const obj={title:this.refs.title.value,amount:this.refs.amount.value,date:this.refs.date.value}
+    const obj={title:this.refs.title.value,amount:this.refs.amount.value,date:this.refs.date.value,category:this.refs.category.value}
     this.setState({
       amount:this.state.amount+1,
-      table:[...this.state.table,obj]
+      table:[...this.state.table,obj],
+      total:this.state.total+Number(obj.amount)
  
     });
 
-    console.log(this.state.amount +" "+this.state.table)
-   }
+    }
+
+    saveCategory()
+    {
+
+      this.setState(prevState => ({
+        modalCat: !prevState.modalCat
+      }));
+      const cat=this.refs.categoryInput.value;
+      this.setState({
+        categoryArr:[...this.state.categoryArr,cat] 
+      });
+  
+    }
   
 
   render() {
@@ -73,7 +97,7 @@ class Nav extends Component {
   <a className="nav-link" href="#">Transactions</a>
   </li>
   <li className="nav-item">
-  <a className="nav-link" href="#">Categories</a>
+  <a className="nav-link" onClick={this.toggleCat} href="#">Categories</a>
   </li>
   </ul>
   </div>
@@ -83,20 +107,53 @@ class Nav extends Component {
   </header>
 
 <br></br>
-<Button color="primary" onClick={this.toggle}>Add Transaction</Button>
+
+<Button color="primary" onClick={this.toggle}>Add Expenses</Button>
+<br></br><br></br>
+<div className="row">
+ <div className="col-sm"  >Total:<b>{this.state.total} Rs</b></div>
+ 
+</div>
+
+
 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
           <ModalHeader toggle={this.toggle}>Transaction</ModalHeader>
           <ModalBody>
+            <label>Categories</label>
+             <select className="form-control" id="sel1" ref="category">
+
+                    {
+                  this.state.categoryArr.map(data=>(
+                     <option>{data}</option>
+
+                  ))
+                }
+         
+              </select>
           <label  >Title</label>
                     <input type="text" className="form-control" ref="title"  placeholder="Enter title"></input>
                     <label >Amount</label>
                     <input type="number" className="form-control"  ref="amount" placeholder="Enter amount"></input>
                     <label >Date </label>
-                    <input type="text" name="birthdate" ref="date"  className="form-control" ></input>
+                    <input className="form-control" type="date" ref="date"  ></input>
                       </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.trans}>Submit</Button>{' '}
             <Button color="danger" onClick={this.toggle}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+
+
+
+        <Modal isOpen={this.state.modalCat} toggle={this.toggleCat} className={this.props.className}>
+          <ModalHeader toggle={this.toggleCat}>Category</ModalHeader>
+          <ModalBody>
+            <label>Name</label>
+                <input type="text" className="form-control"  ref="categoryInput" placeholder="Enter Category"></input>
+               </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this.saveCategory}>Save</Button>{' '}
+            <Button color="danger" onClick={this.toggleCat}>Cancel</Button>
           </ModalFooter>
         </Modal>
 <br></br><br></br>
@@ -104,25 +161,27 @@ class Nav extends Component {
 <Table>
         <thead>
           <tr>
+            <th>Categories</th>
             <th>Title</th>
-            <th>Amount</th>
-            <th>SpentOn</th>
+            <th><img src={require('/home/arul/ExpenseTracker-UI/my-app/src/images/money.png')} width="45" height="45"/></th>
+            <th><img src={require('/home/arul/ExpenseTracker-UI/my-app/src/images/exp.png')} width="45" height="45"/></th>
           </tr>
         </thead>
+        
         <tbody>
-          <tr>
-          {
+        {
           this.state.table.map(data=>(
+          <tr>
+             <td>{data.category}</td>
              <td>{data.title}</td>
             <td>{data.amount}</td>
-            <td>{data.date}</td>
- 
+            <td>{data.date}</td>    
+            </tr>
 
           ))
          
+       
         }
-          </tr>
-           
         </tbody>
       </Table>
       
