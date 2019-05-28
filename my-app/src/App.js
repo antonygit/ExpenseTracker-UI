@@ -12,16 +12,19 @@ class Nav extends Component {
   collapsed: true,
   modal: false,
   modalCat:false,
-  collapsedCat:true
+  collapsedCat:true,
+  show:"visible"
   };
   this.toggle = this.toggle.bind(this);
   this.toggleCat = this.toggleCat.bind(this);
   this.saveCategory=this.saveCategory.bind(this);
+  this.analyze=this.analyze.bind(this);
+
 
   this.trans = this.trans.bind(this);
 
 
-  this.state={  amount:0,table:[],total:0,categoryArr:["Gas"]  }
+  this.state={  amount:0,table:[],total:0,categoryArr:["Gas"],analyzeTable:[]  }
 
   }
   //NavBar toggle logic
@@ -76,8 +79,33 @@ class Nav extends Component {
       });
   
     }
-  
 
+
+    analyze()
+    {
+      var that=this;//scope making this to that
+      var analyze={};
+      this.state.categoryArr.forEach(function(element) {
+        var overview =that.state.table.filter(cat =>cat.category==element).reduce((acc,ob)=>acc+Number(ob.amount),0)
+        var count =that.state.table.filter(cat =>cat.category==element).reduce((acc,ob)=>acc+1,0)
+        
+        analyze[element]={"Category":element,"trans":count,"total":overview}
+        });
+
+        var add=this.state.analyzeTable.concat(analyze);
+        this.setState({
+          analyzeTable:[],
+          analyzeTable:add
+        });
+        
+        this.state.analyzeTable.map(data=>( 
+          console.log(data)
+        ))
+            
+
+   }
+
+ 
   render() {
   const collapsed = this.state.collapsed;
   const classOne = collapsed ? 'collapse navbar-collapse' : 'collapse navbar-collapse show';
@@ -98,6 +126,9 @@ class Nav extends Component {
   </li>
   <li className="nav-item">
   <a className="nav-link" onClick={this.toggleCat} href="#">Categories</a>
+  </li>
+  <li className="nav-item">
+  <a className="nav-link" onClick={this.analyze}   href="#">Analyze</a>
   </li>
   </ul>
   </div>
@@ -158,13 +189,15 @@ class Nav extends Component {
         </Modal>
 <br></br><br></br>
 
-<Table>
+ 
+
+<Table style={{visibility:`${ this.state.show }%`}}>
         <thead>
           <tr>
             <th>Categories</th>
             <th>Title</th>
-            <th><img src={require('/home/arul/ExpenseTracker-UI/my-app/src/images/money.png')} width="45" height="45"/></th>
-            <th><img src={require('/home/arul/ExpenseTracker-UI/my-app/src/images/exp.png')} width="45" height="45"/></th>
+            <th><img src={require('C:/Users/antonya/Desktop/my-app/src/images/money.png')} width="45" height="45"/></th>
+            <th><img src={require('C:/Users/antonya/Desktop/my-app/src/images/exp.png')} width="45" height="45"/></th>
           </tr>
         </thead>
         
@@ -184,9 +217,10 @@ class Nav extends Component {
         }
         </tbody>
       </Table>
+      </div>
       
  
-  </div>
+ 
   );
   }
   }
